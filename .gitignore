@@ -42,3 +42,4 @@ Thumbs.db
 
 # Large runtime artifacts/logs
 *.log
+*.db
