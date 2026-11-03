@@ -1,4 +1,4 @@
-"""Core schemas and type definitions for ACR-RAG Platform."""
+"""Core schemas and type definitions for CalibRAG Platform."""
 from enum import Enum
 from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field
@@ -12,7 +12,7 @@ class RetrievalTier(str, Enum):
 
 
 class QueryRequest(BaseModel):
-    """User incoming query request to ACR-RAG."""
+    """User incoming query request to CalibRAG."""
     query: str = Field(..., description="The user's prompt or question")
     workspace_id: str = Field(default="default_workspace", description="Tenant or workspace ID")
     sla_policy: Optional[SLAPolicyMode] = Field(default=None, description="Override SLA policy profile")

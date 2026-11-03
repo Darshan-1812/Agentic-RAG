@@ -1,4 +1,4 @@
-"""ACR-RAG Router Package (Member 1: Control Plane & Router Lead)."""
+"""CalibRAG Router Package (Member 1: System 1 Router & Verifier Lead)."""
 from router.jev_client import JevClient, JevChoice, JevScore, JevNoul
 from router.policy_manager import PolicyManager
 from router.pre_retrieval_router import PreRetrievalRouter

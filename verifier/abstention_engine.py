@@ -57,7 +57,7 @@ class AbstentionEngine:
             missing_documents.append("Relevant workspace technical documentation or database tables")
 
         explanation = (
-            f"ACR-RAG halted generation under {confidence_result.policy_mode.value.title()} SLA policy "
+            f"CalibRAG halted generation under {confidence_result.policy_mode.value.title()} SLA policy "
             f"because evidence confidence (C_evidence = {confidence_result.c_evidence:.2f}) fell below "
             f"the required abstention floor (tau_abstain = {confidence_result.tau_abstain:.2f}). "
             f"The workspace does not contain verified records answering this query."

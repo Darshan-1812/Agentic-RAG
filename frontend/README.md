@@ -1,13 +1,15 @@
-# Frontend Module (Member 4: Product UI, Control Room & Eval Lead)
+# Frontend Module (Member 4: BYOK Studio UI & Benchmark Lead)
 
-## Key Pages & Views:
-1. **Next.js 15 BYOK Studio (`frontend/app/workspaces/`)**:
-   - Workspace creation & 3-click drag-and-drop document upload.
-   - FastMCP connector toggle UI.
-2. **Split-Screen Shadow Mode Playground (`frontend/app/playground/`)**:
-   - Side-by-side comparison: Always-On Agentic RAG vs. ACR-RAG with Jev Control Plane.
-3. **Agent Control Room Dashboard (`frontend/app/control-room/`)**:
-   - Live telemetry traces, latency percentiles (P50/P95), and token dollar savings.
-   - Interactive SLA policy sliders (Economy, Balanced, Strict Zero-Hallucination).
-4. **Auto-Benchmark Suite (`frontend/app/benchmark/`)**:
-   - One-click benchmark runner displaying Pareto frontiers of Faithfulness vs. Cost.
+## 1. Overview
+The `frontend/` package provides CalibRAG's Next.js 15 product interface designed to turn complex agentic RAG into an accessible self-serve developer experience.
+
+## 2. Core Views Owned:
+1. **3-Click BYOK Workspace Studio (`components/BYOKWorkspaceStudio.tsx`)**:
+   - Workspace creation and isolated tenant configuration.
+   - Drag-and-drop document upload (parsed via IBM Docling into pgvector, BM25, and LightRAG).
+   - FastMCP connector toggles (PostgreSQL ERP & GitHub issues).
+2. **Split-Screen Comparison Playground (`components/SplitScreenPlayground.tsx`)**:
+   - Side-by-side execution: **Standard Fixed RAG vs. CalibRAG Adaptive Routing**.
+   - Live telemetry indicators: minimum viable tier chosen, confidence score ($C_{evidence}$), token dollars saved, and exact inline citations.
+3. **Embeddable JS Widget**:
+   - Lightweight script allowing client websites or internal wikis to embed the CalibRAG chat experience via the drop-in proxy API.

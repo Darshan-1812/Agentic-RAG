@@ -52,7 +52,7 @@ def generate_synthetic_calibration_dataset(n_samples: int = 300, seed: int = 42)
 
 def run_evaluation():
     print("\n================================================================================")
-    print(" ACR-RAG RESEARCH EVALUATION: System 1 Calibration & Routing Math (Section 3)")
+    print(" CalibRAG RESEARCH EVALUATION: System 1 Calibration & Routing Math (Section 3)")
     print("================================================================================\n")
 
     router = PreRetrievalRouter()

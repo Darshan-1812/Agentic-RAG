@@ -1,0 +1,37 @@
+{
+  "Dense Vector Only (pgvector HNSW)": {
+    "Recall@1": 0.542,
+    "Recall@3": 0.684,
+    "Recall@5": 0.741,
+    "Recall@10": 0.812,
+    "MRR@10": 0.621
+  },
+  "Lexical BM25 Only (ParadeDB pg_search)": {
+    "Recall@1": 0.498,
+    "Recall@3": 0.635,
+    "Recall@5": 0.71,
+    "Recall@10": 0.785,
+    "MRR@10": 0.583
+  },
+  "Hybrid RRF (Dense + BM25)": {
+    "Recall@1": 0.675,
+    "Recall@3": 0.798,
+    "Recall@5": 0.862,
+    "Recall@10": 0.915,
+    "MRR@10": 0.746
+  },
+  "Hybrid RRF + BGE Cross-Encoder (bge-reranker-v2-m3)": {
+    "Recall@1": 0.824,
+    "Recall@3": 0.912,
+    "Recall@5": 0.948,
+    "Recall@10": 0.976,
+    "MRR@10": 0.871
+  },
+  "Hybrid RRF + Cross-Encoder + LightRAG (Proposed CalibRAG Retrieval)": {
+    "Recall@1": 0.896,
+    "Recall@3": 0.954,
+    "Recall@5": 0.982,
+    "Recall@10": 0.994,
+    "MRR@10": 0.932
+  }
+}

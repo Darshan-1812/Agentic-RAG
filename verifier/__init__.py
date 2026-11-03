@@ -1,4 +1,4 @@
-"""ACR-RAG Verifier Package (Member 1: Control Plane & Router Lead)."""
+"""CalibRAG Verifier Package (Member 1: System 1 Router & Verifier Lead)."""
 from verifier.confidence_gate import EvidenceSufficiencyGate, compute_evidence_confidence
 from verifier.claim_verifier import ClaimVerifier
 from verifier.abstention_engine import AbstentionEngine

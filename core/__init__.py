@@ -1,4 +1,4 @@
-"""ACR-RAG Core Package."""
+"""CalibRAG Core Package."""
 from core.config import settings, SLAPolicyConfig
 from core.schemas import (
     RetrievalTier,
@@ -11,6 +11,7 @@ from core.schemas import (
     InsufficientEvidenceResponse,
     QueryRequest,
 )
+from core.telemetry import CalibRAGTelemetry, ACRTelemetry, calculate_telemetry
 
 __all__ = [
     "settings",
@@ -24,4 +25,7 @@ __all__ = [
     "VerificationResult",
     "InsufficientEvidenceResponse",
     "QueryRequest",
+    "CalibRAGTelemetry",
+    "ACRTelemetry",
+    "calculate_telemetry",
 ]

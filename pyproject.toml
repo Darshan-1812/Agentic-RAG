@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "acr-rag"
-version = "0.1.0"
-description = "ACR-RAG: Adaptive Control & Retrieval Platform (System 1 Jev + System 2 Agentic RAG)"
+name = "calibrag"
+version = "0.2.0"
+description = "CalibRAG: Adaptive Dual-System RAG & Agent Platform (System 1 Jev + System 2 Cascaded RAG)"
 authors = [
-    { name = "Member 1: Control Plane & Router Lead" },
+    { name = "Member 1: System 1 Router & Verifier Lead" },
     { name = "Member 2: Data, Hybrid RAG & GraphRAG Lead" },
     { name = "Member 3: Agentic Workflow & FastMCP Lead" },
-    { name = "Member 4: Product UI, Control Room & Eval Lead" }
+    { name = "Member 4: BYOK Studio UI & Benchmark Lead" }
 ]
 readme = "README.md"
 requires-python = ">=3.10"

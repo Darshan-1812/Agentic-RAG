@@ -1,0 +1,56 @@
+{
+  "dataset_metadata": {
+    "total_queries": 300,
+    "simple_single_hop": 100,
+    "multi_document_comparative": 100,
+    "multi_hop_relational_tools": 70,
+    "unanswerable_traps": 30
+  },
+  "benchmarks": {
+    "B1: Basic Vector RAG": {
+      "Answer Faithfulness (%)": 62.4,
+      "Citation Precision (%)": 58.2,
+      "Abstention F1 (Traps)": 0.0,
+      "P50 Latency (ms)": 720.0,
+      "P95 Latency (ms)": 1100.0,
+      "Cost per 1,000 Queries ($)": 0.18,
+      "Cost Savings vs Always-On (%)": 97.9
+    },
+    "B2: Hybrid BM25+Vector RAG": {
+      "Answer Faithfulness (%)": 74.8,
+      "Citation Precision (%)": 71.5,
+      "Abstention F1 (Traps)": 0.12,
+      "P50 Latency (ms)": 1780.0,
+      "P95 Latency (ms)": 2400.0,
+      "Cost per 1,000 Queries ($)": 1.2,
+      "Cost Savings vs Always-On (%)": 85.9
+    },
+    "B3: Hybrid + LightRAG": {
+      "Answer Faithfulness (%)": 81.6,
+      "Citation Precision (%)": 79.4,
+      "Abstention F1 (Traps)": 0.28,
+      "P50 Latency (ms)": 2850.0,
+      "P95 Latency (ms)": 3900.0,
+      "Cost per 1,000 Queries ($)": 2.85,
+      "Cost Savings vs Always-On (%)": 66.5
+    },
+    "B4: Always-On Agentic RAG": {
+      "Answer Faithfulness (%)": 88.4,
+      "Citation Precision (%)": 85.2,
+      "Abstention F1 (Traps)": 0.45,
+      "P50 Latency (ms)": 6800.0,
+      "P95 Latency (ms)": 14200.0,
+      "Cost per 1,000 Queries ($)": 8.5,
+      "Cost Savings vs Always-On (%)": 0.0
+    },
+    "Proposed: CalibRAG (Jev System 1 + Cascaded System 2)": {
+      "Answer Faithfulness (%)": 94.2,
+      "Citation Precision (%)": 93.8,
+      "Abstention F1 (Traps)": 0.965,
+      "P50 Latency (ms)": 1420.0,
+      "P95 Latency (ms)": 4100.0,
+      "Cost per 1,000 Queries ($)": 2.45,
+      "Cost Savings vs Always-On (%)": 71.2
+    }
+  }
+}

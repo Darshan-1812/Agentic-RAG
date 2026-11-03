@@ -69,4 +69,4 @@ def test_build_structured_abstention_response():
     assert len(resp.missing_facts) > 0
     assert any("2027" in f for f in resp.missing_facts)
     assert len(resp.missing_documents) > 0
-    assert "ACR-RAG halted generation" in resp.explanation
+    assert "CalibRAG halted generation" in resp.explanation

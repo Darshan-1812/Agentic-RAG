@@ -1,7 +1,14 @@
 # Agents Module (Member 3: Agentic Workflow & FastMCP Lead)
 
-## Core Responsibilities:
-- **Tier 3 LangGraph Supervisor**: Cyclic multi-agent supervisor orchestrating sub-goals, LightRAG graph lookups, and MCP tool execution.
-- **Mid-Flight Escalation Receiver**: Triggered when Member 1's Mid-Pipeline Confidence Gate determines $C_{evidence} < \tau_{escalate}$.
-- **FastMCP Tool Integration**: Read-only PostgreSQL ERP database server and GitHub Issues/PRs server.
-- **OpenAI Proxy API**: `POST /v1/chat/completions` drop-in proxy with streaming SSE and telemetry header injection.
+## 1. Overview
+The `agents/` module implements CalibRAG's Tier 3 System 2 Multi-Agent Orchestration using LangGraph and the FastMCP protocol.
+
+## 2. Core Responsibilities Owned:
+1. **Tier 3 LangGraph Supervisor (`langgraph_supervisor.py`)**:
+   - Decomposes complex multi-hop queries into atomic sub-goals.
+   - Provides cyclic state control for mid-flight escalation triggered by Member 1's Confidence Gate ($C_{evidence} < \tau_{escalate}$).
+   - Traverses 2-hop entity links in Member 2's LightRAG knowledge graph.
+   - Invokes FastMCP tool servers dynamically.
+2. **Research Paper Section 5 Contribution**:
+   - Authors Section 5: *Agentic Escalation & MCP Tool Orchestration*.
+   - Evaluates multi-hop query resolution and tool invocation latency vs. monolithic chains.

@@ -1,4 +1,4 @@
-"""Telemetry and cost accounting engine for ACR-RAG."""
+"""Telemetry and cost accounting engine for CalibRAG Platform."""
 from typing import Dict, Any, Optional
 from pydantic import BaseModel, Field
 from core.schemas import RetrievalTier
@@ -8,15 +8,15 @@ from core.schemas import RetrievalTier
 BASELINE_COSTS = {
     # Always-On Agentic RAG baseline runs frontier model + graph traversal + tools every time
     "always_on_agentic_baseline": 0.0085,
-    # ACR-RAG Tiers (Retrieval + Model generation)
+    # CalibRAG Tiers (Retrieval + Model generation)
     RetrievalTier.TIER1_VECTOR: 0.00018,
     RetrievalTier.TIER2_HYBRID: 0.00120,
     RetrievalTier.TIER3_AGENTIC: 0.00790,
 }
 
 
-class ACRTelemetry(BaseModel):
-    """Runtime execution telemetry for Agent Control Room and HTTP response headers."""
+class CalibRAGTelemetry(BaseModel):
+    """Runtime execution telemetry for CalibRAG and HTTP response headers."""
     query_id: str
     workspace_id: str
     tier_used: RetrievalTier
@@ -30,13 +30,23 @@ class ACRTelemetry(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
     def to_http_headers(self) -> Dict[str, str]:
-        """Convert telemetry to standard ACR HTTP response headers as per blueprint Section 3.2."""
-        return {
+        """Convert telemetry to standard CalibRAG HTTP response headers as per blueprint Section 3.2."""
+        headers = {
+            "X-CalibRAG-Tier": self.tier_used.value,
+            "X-CalibRAG-Confidence": f"{self.jev_confidence:.4f}",
+            "X-CalibRAG-Latency-Ms": f"{self.latency_ms:.2f}",
+            "X-CalibRAG-Cost-Saved-USD": f"{self.cost_saved_usd:.6f}",
+            # Backward compatibility aliases for legacy clients
             "X-ACR-Tier-Used": self.tier_used.value,
             "X-ACR-Jev-Confidence": f"{self.jev_confidence:.4f}",
             "X-ACR-Latency-Ms": f"{self.latency_ms:.2f}",
             "X-ACR-Cost-Saved-USD": f"{self.cost_saved_usd:.6f}",
         }
+        return headers
+
+
+# Backward-compatible alias
+ACRTelemetry = CalibRAGTelemetry
 
 
 def calculate_telemetry(
@@ -49,14 +59,14 @@ def calculate_telemetry(
     is_escalated: bool = False,
     is_abstained: bool = False,
     metadata: Optional[Dict[str, Any]] = None,
-) -> ACRTelemetry:
+) -> CalibRAGTelemetry:
     """Computes runtime telemetry including exact dollar savings relative to Always-On Agentic RAG."""
     baseline = BASELINE_COSTS["always_on_agentic_baseline"]
     cost = actual_cost_usd if actual_cost_usd is not None else BASELINE_COSTS[tier_used]
     cost_saved = max(0.0, baseline - cost)
     savings_pct = (cost_saved / baseline) * 100.0 if baseline > 0 else 0.0
 
-    return ACRTelemetry(
+    return CalibRAGTelemetry(
         query_id=query_id,
         workspace_id=workspace_id,
         tier_used=tier_used,

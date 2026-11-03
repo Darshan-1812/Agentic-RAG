@@ -20,6 +20,13 @@ def test_telemetry_cost_savings_tier1():
     assert telemetry.cost_savings_pct >= 95.0
 
     headers = telemetry.to_http_headers()
+    # CalibRAG standard headers
+    assert headers["X-CalibRAG-Tier"] == "tier1_vector"
+    assert "0.9500" in headers["X-CalibRAG-Confidence"]
+    assert "680.00" in headers["X-CalibRAG-Latency-Ms"]
+    assert float(headers["X-CalibRAG-Cost-Saved-USD"]) > 0.008
+
+    # Backward compatibility aliases
     assert headers["X-ACR-Tier-Used"] == "tier1_vector"
     assert "0.9500" in headers["X-ACR-Jev-Confidence"]
     assert "680.00" in headers["X-ACR-Latency-Ms"]

@@ -1,4 +1,5 @@
-"""Application configuration and SLA policy settings for ACR-RAG."""
+"""Application configuration and SLA policy settings for CalibRAG Platform."""
+import os
 from enum import Enum
 from typing import Dict
 from pydantic import BaseModel, Field
@@ -46,13 +47,22 @@ DEFAULT_POLICY_PROFILES: Dict[SLAPolicyMode, SLAPolicyConfig] = {
 
 
 class Settings(BaseSettings):
+    # Product Metadata
+    app_name: str = "CalibRAG"
+    app_version: str = "0.2.0"
+
     # Jev Control Plane settings
     jev_api_key: str = "mock-jev-preview-key"
     jev_api_base_url: str = "https://api.typesafe.ai/v1"
     jev_price_per_million_input_tokens: float = 0.042
     
-    # SLA Defaults
+    # SLA Defaults (supporting CALIBRAG_ and legacy ACR_ env variables)
     default_sla_policy: SLAPolicyMode = SLAPolicyMode.BALANCED
+    
+    # Database and Connectors
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/calibrag"
+    postgres_erp_readonly_uri: str = "postgresql://readonly:erp_pass@localhost:5432/erp"
+    github_token: str = ""
     
     # Logging & env
     environment: str = "development"

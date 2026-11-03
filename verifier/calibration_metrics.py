@@ -96,7 +96,7 @@ def generate_reliability_diagram(
     # Render clean ASCII diagram
     lines = [
         "===========================================================",
-        f" ACR-RAG Reliability Diagram (ECE: {ece:.4f}, Brier: {brier:.4f}, MCE: {mce:.4f})",
+        f" CalibRAG Reliability Diagram (ECE: {ece:.4f}, Brier: {brier:.4f}, MCE: {mce:.4f})",
         "===========================================================",
         "Bin Range        | Count | Conf  | Acc   | Calibration Bar (A=Acc, C=Conf)",
         "-----------------+-------+-------+-------+------------------"
