@@ -1,0 +1,24 @@
+name: calibrag-retrieval
+
+services:
+  postgres:
+    image: paradedb/paradedb:0.26.5-pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-calibrag}
+      POSTGRES_INITDB_ARGS: --data-checksums
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - calibrag_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  calibrag_pgdata:

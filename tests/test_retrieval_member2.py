@@ -3,7 +3,8 @@ import pytest
 from core.schemas import ChunkEvidence
 from retrieval.docling_parser import DoclingDocumentParser
 from retrieval.pg_hybrid_search import PGHybridSearchEngine
-from retrieval.lightrag_indexer import LightRAGGraphEngine, GraphNode, GraphEdge
+from retrieval.config import RetrievalSettings
+from retrieval.lightrag_indexer import LightRAGGraphEngine
 from retrieval.recall_ablation import run_retrieval_recall_ablation
 
 
@@ -39,17 +40,19 @@ def test_hybrid_search_rrf_and_cross_encoder():
     assert reranked[0].cross_encoder_logit > reranked[1].cross_encoder_logit
 
 
-def test_lightrag_2hop_traversal():
-    graph = LightRAGGraphEngine()
-    # Traversal from VoltCore India
-    res = graph.traverse_entities(query="Who is lead architect for VoltCore modules?", entity_seeds=["VoltCore"], max_hops=2)
-    
-    assert res["total_nodes_found"] >= 3
-    node_names = [n["entity_name"] for n in res["nodes"]]
-    assert "VoltCore India" in node_names
-    assert "BMS-Controller-v4" in node_names
-    assert "R. Kulkarni" in node_names
-    assert "Graph Link:" in res["context_summary"]
+def test_lightrag_without_index_returns_empty(tmp_path):
+    settings = RetrievalSettings(graph_storage_root=tmp_path)
+    graph = LightRAGGraphEngine(settings=settings, workspace_id="member2-empty")
+    res = graph.traverse_entities(
+        query="Who is lead architect for VoltCore modules?",
+        entity_seeds=["VoltCore"],
+        max_hops=2,
+    )
+    graph.close()
+
+    assert res["total_nodes_found"] == 0
+    assert res["nodes"] == []
+    assert res["edges"] == []
 
 
 def test_recall_ablation_metrics():

@@ -1,0 +1,6 @@
+# Member 2 Phase 2 runtime dependencies.
+# Install separately from the lightweight API/agents stack:
+#   python -m pip install -r retrieval/requirements-ingestion.txt
+pydantic>=2.7,<3
+asyncpg==0.32.0
+docling==2.148.0

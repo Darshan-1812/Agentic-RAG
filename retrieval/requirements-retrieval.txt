@@ -1,0 +1,10 @@
+﻿# Phase 3 hybrid retrieval runtime (install alongside requirements-ingestion.txt).
+# FlagEmbedding is the canonical BGE-M3 / bge-reranker runtime. Its wheel also
+# installs datasets, pyarrow, ir-datasets, sentence-transformers, and peft.
+FlagEmbedding==1.4.2
+transformers>=4.44.2,<6.0.0
+sentence-transformers==6.2.0
+torch>=1.6.0
+huggingface-hub>=0.21.0
+numpy>=1.24.0
+lightrag-hku==1.5.7

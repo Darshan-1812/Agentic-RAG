@@ -1,140 +1,117 @@
-"""IBM Docling Document Parsing & Chunking Module (Member 2).
+"""Compatibility wrapper for the original Member 2 Docling parser.
 
-Parses complex PDFs, DOCX, and Markdown preserving tables, section hierarchy,
-multi-column layouts, and page-level provenance.
+New code should use ``retrieval.ingestion``. This module keeps the historical
+``DoclingDocumentParser`` and ``DocumentChunk`` import paths working while
+delegating real parsing to the Docling adapter and structure-aware chunker.
 """
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
-import os
-import re
+from __future__ import annotations
 
+from pathlib import Path
+from typing import List, Optional
 
-class DocumentChunk(BaseModel):
-    """Parsed document chunk with rich provenance metadata."""
-    chunk_id: str
-    doc_id: str
-    doc_title: str
-    content: str
-    page_number: int
-    section_hierarchy: List[str] = Field(default_factory=list)
-    has_table: bool = False
-    table_markdown: Optional[str] = None
-    char_count: int
-    token_count_est: int
+from retrieval.config import RetrievalSettings
+from retrieval.ingestion.chunker import chunk_blocks
+from retrieval.ingestion.docling_parser import DoclingParser
+from retrieval.schemas import DocumentChunk, validate_workspace_id
 
 
 class DoclingDocumentParser:
-    """Document Intelligence parser wrapping IBM Docling pipelines with fallback."""
+    """Backward-compatible parser facade.
 
-    def __init__(self, target_chunk_size: int = 512, overlap: int = 64):
+    The old class accepted a token-sized ``target_chunk_size`` and ``overlap``.
+    Those values are converted to approximate character budgets before being
+    passed to the structure-aware chunker.
+    """
+
+    def __init__(
+        self,
+        target_chunk_size: int = 512,
+        overlap: int = 64,
+        *,
+        settings: Optional[RetrievalSettings] = None,
+        converter: object = None,
+    ):
         self.chunk_size = target_chunk_size
         self.overlap = overlap
+        target_chars = max(200, int(target_chunk_size) * 4)
+        overlap_chars = max(0, int(overlap) * 4)
+        if overlap_chars >= target_chars:
+            overlap_chars = max(0, target_chars // 4)
+        max_chars = max(target_chars, int(target_chars * 1.5))
+        self._settings = settings or RetrievalSettings.from_env(
+            env_file=False,
+            overrides={
+                "chunk_target_chars": target_chars,
+                "chunk_max_chars": max_chars,
+                "chunk_overlap_chars": overlap_chars,
+            },
+        )
+        self._parser = DoclingParser(settings=self._settings, converter=converter)
 
     def parse_document(
         self,
         file_path: str,
         doc_id: Optional[str] = None,
-        workspace_id: str = "default_workspace"
+        workspace_id: str = "default_workspace",
     ) -> List[DocumentChunk]:
-        """Parses a document file (PDF/DOCX/MD) into structured chunks with page provenance."""
-        filename = os.path.basename(file_path)
-        base_id = doc_id or os.path.splitext(filename)[0]
-
-        # In production with docling installed:
-        # from docling.document_converter import DocumentConverter
-        # doc = DocumentConverter().convert(file_path)
-        # Below is the production-ready high-fidelity parser preserving layout & tables:
-        
-        chunks: List[DocumentChunk] = []
-        if not os.path.exists(file_path):
-            # Generate simulated chunks if file is provided as virtual test path
-            return self._generate_simulated_chunks(file_path, base_id)
-
-        try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                raw_text = f.read()
-        except Exception:
-            raw_text = f"Sample document content for {filename}"
-
-        # Segment text into logical sections / paragraphs
-        paragraphs = re.split(r'\n\n+', raw_text)
-        current_chunk = []
-        current_len = 0
-        chunk_idx = 1
-        page_num = 1
-
-        for p in paragraphs:
-            p_clean = p.strip()
-            if not p_clean:
-                continue
-
-            # Detect page breaks or section headings
-            if "page" in p_clean.lower() and len(p_clean) < 30:
-                page_match = re.search(r'\d+', p_clean)
-                if page_match:
-                    page_num = int(page_match.group(0))
-
-            has_table = "|" in p_clean and "-|-" in p_clean
-            p_len = len(p_clean)
-
-            if current_len + p_len > self.chunk_size and current_chunk:
-                content = "\n\n".join(current_chunk)
-                chunks.append(DocumentChunk(
-                    chunk_id=f"{base_id}_chunk_{chunk_idx:03d}",
-                    doc_id=base_id,
-                    doc_title=filename,
-                    content=content,
-                    page_number=page_num,
-                    has_table=has_table,
-                    char_count=len(content),
-                    token_count_est=len(content) // 4
-                ))
-                chunk_idx += 1
-                current_chunk = [p_clean]
-                current_len = p_len
-            else:
-                current_chunk.append(p_clean)
-                current_len += p_len
-
-        if current_chunk:
-            content = "\n\n".join(current_chunk)
-            chunks.append(DocumentChunk(
-                chunk_id=f"{base_id}_chunk_{chunk_idx:03d}",
-                doc_id=base_id,
-                doc_title=filename,
-                content=content,
-                page_number=page_num,
-                has_table=has_table,
-                char_count=len(content),
-                token_count_est=len(content) // 4
-            ))
-
-        return chunks
+        """Parse a document through Docling and return legacy-compatible chunks."""
+        tenant = validate_workspace_id(workspace_id)
+        base_id = doc_id or Path(file_path).stem
+        parsed = self._parser.parse(file_path, tenant)
+        source_type = {
+            ".pdf": "pdf",
+            ".docx": "docx",
+            ".md": "markdown",
+            ".markdown": "markdown",
+        }.get(Path(file_path).suffix.lower(), "document")
+        return chunk_blocks(
+            parsed.blocks,
+            doc_id=base_id,
+            workspace_id=tenant,
+            doc_title=parsed.doc_title,
+            target_chars=self._settings.chunk_target_chars,
+            max_chars=self._settings.chunk_max_chars,
+            overlap_chars=self._settings.chunk_overlap_chars,
+            source_type=source_type,
+        )
 
     def _generate_simulated_chunks(self, file_path: str, doc_id: str) -> List[DocumentChunk]:
-        """Provides grounded mock chunks for contract/SLA blueprints when testing."""
+        """Deprecated deterministic fixtures retained for old tests/tooling.
+
+        This helper is never called by ``parse_document`` and must not be used in
+        production ingestion.
+        """
         if "qa_sop" in file_path.lower():
             return [
                 DocumentChunk(
                     chunk_id=f"{doc_id}_chunk_001",
                     doc_id=doc_id,
                     doc_title="QA_SOP_2026.pdf",
-                    content="Section 4.2 Quality Standards: The maximum defect tolerance percentage allowed for lithium cell batches is strictly 0.5%. Any batch exceeding 0.5% defect rate must be quarantined immediately.",
+                    content=(
+                        "Section 4.2 Quality Standards: The maximum defect tolerance "
+                        "percentage allowed for lithium cell batches is strictly 0.5%. "
+                        "Any batch exceeding 0.5% defect rate must be quarantined immediately."
+                    ),
                     page_number=12,
                     char_count=210,
-                    token_count_est=52
+                    token_count_est=52,
                 )
             ]
-        elif "sla" in file_path.lower() or "voltcore" in file_path.lower():
+        if "sla" in file_path.lower() or "voltcore" in file_path.lower():
             return [
                 DocumentChunk(
                     chunk_id=f"{doc_id}_chunk_001",
                     doc_id=doc_id,
                     doc_title="VoltCore_SLA.pdf",
-                    content="Clause 8.2 Supplier Delivery Penalties: Standard lead time is 14 days. Any delivery delay exceeding 7 business days triggers a mandatory 5% late penalty fee per week capped at 25% of total contract value.",
+                    content=(
+                        "Clause 8.2 Supplier Delivery Penalties: Standard lead time is "
+                        "14 days. Any delivery delay exceeding 7 business days triggers a "
+                        "mandatory 5% late penalty fee per week capped at 25% of total "
+                        "contract value."
+                    ),
                     page_number=6,
                     char_count=218,
-                    token_count_est=55
+                    token_count_est=55,
                 )
             ]
         return [
@@ -145,6 +122,9 @@ class DoclingDocumentParser:
                 content=f"Standard policy documentation for {doc_id}.",
                 page_number=1,
                 char_count=50,
-                token_count_est=12
+                token_count_est=12,
             )
         ]
+
+
+__all__ = ["DoclingDocumentParser", "DocumentChunk"]

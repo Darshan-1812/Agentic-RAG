@@ -1,0 +1,8 @@
+# Local document storage and worker state
+storage/
+*.tmp
+
+# Local environment / caches
+.env
+__pycache__/
+.pytest_cache/
